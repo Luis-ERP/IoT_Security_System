@@ -35,7 +35,7 @@ def face_rec(img_arr, known_face_encodings, known_face_names):
 	face_encodings = face_recognition.face_encodings(img_arr, face_locations)
 	
 	# Recognice faces
-	names = []
+	names = ["Posible intruso"]
 	recognized_people = []
 	for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
 		# See if the face is a match for the known face(s)

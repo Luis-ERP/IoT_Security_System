@@ -3,14 +3,15 @@ from flask_ngrok import run_with_ngrok
 from flask_socketio import SocketIO, emit
 import external_connections as db
 import mqtt
-# from reconocimiento_facial import decode_url, recognize_sample_face, face_rec
+from reconocimiento_facial import decode_url, recognize_sample_face, face_rec
 
 import os, sys, json, time
+import numpy as np 
 
 
 app = Flask(__name__)
 socket = SocketIO(app)
-run_with_ngrok(app)
+# run_with_ngrok(app)
 
 
 @app.route('/')
@@ -23,11 +24,15 @@ def index():
 	context['times_unknown_faces'] = db.times_unknown_faces()
 	return render_template('index.html', data=context)
 
+@app.route('/register_user', methods=['POST'])
+def register_user(data):
+	pass
+
 
 @app.route('/recfacial', methods=['POST', 'GET'])
 def check_image():
 	print('Funcion reconocimiento facial: API servidor')
-	"""
+
 	# Que tome la ultima foto de firebase
 	video_bytes_url = db.get_last_video_url()
 	# Decode de base64
@@ -36,19 +41,17 @@ def check_image():
 		## Obtener los nombre de las personas registradas en firebase
 	names = db.get_known_people_names()
 		## Encodear las imagenes de las personas conocidas con el dir de la img: '/isra.jpg'
-	known_imgs_dirs = os.listdir('knwon_faces_img')
+	known_imgs_dirs = os.listdir('static/knwon_faces_img')
 	known_encodings = [recognize_sample_face(dir_) for dir_ in known_imgs_dirs]
 		## Reconocer cara con la img desconocida y las conocidas
-	result = face_rec(img, known_encodings, names)
-	"""
-	result = ['Javier']
+	result = face_rec(np.asarray(img), known_encodings, names)
+
 	# Publique a traves de mqtt
 	open_door = False
 	person_name = result[0]
 	for name in result:
 		if name != 'Posible intruso':
 			open_door = True
-			person_name = ''
 	if open_door:
 		opened = mqtt.open_door()
 	else:
@@ -56,7 +59,10 @@ def check_image():
 	# Actualice interfaz de la aplicación
 	try:
 		img_dir = os.listdir('static/detected_person_img')[-1]
-		socket.emit('announce image', {'img_src': f'static/detected_person_img/{img_dir}', 'registered': open_door})
+		socket.emit('announce image', 
+		{'img_src': f'static/detected_person_img/{img_dir}', 
+		'registered': open_door,
+		'person': person_name})
 	except Exception as e:
 		print(f'No hay imagen registrada o ocurrio un error:\n {e}')
 	# Actualice base de datos de firebase

@@ -48,12 +48,14 @@
 		<div class="col-lg-4 col-sm-12">
 			<div class="security-table section">
 				<table>
+					<thead>
 					<tr>
 						<th>
 							<h2><strong>Seguridad</strong></h2>
 						</th>
-						<th></th>
 					</tr>
+					</thead>
+					<tbody>
 					<tr>
 						<td>Puerta principal abierta</td>
 						<td>
@@ -76,44 +78,60 @@
 						<td>Puerta trasera</td>
 						<td>Proximamente...</td>
 					</tr>
+					</tbody>
 				</table>
 			</div>
 
 			<div class="basic-stats section">
 				<table>
-					<tr>
-						<th>
-							<h2><strong>Stats</strong></h2>
-						</th>
-						<th></th>
-					</tr>
-					<tr>
-						<td># veces que se ha abierto la puerta</td>
-						<td>
-							<span id="puerta-abierta">0</span>
-						</td>
-					</tr>
-					<tr>
-						<td># veces que han entrado registrados</td>
-						<td>
-							<span id="cara-reconocida">0</span>
-						</td>
-					</tr>
-					<tr>
-						<td># veces que se detecta desconocidos</td>
-						<td>
-							<span id="cara-desconocida">0</span>
-						</td>
-					</tr>
+					<thead>
+						<tr>
+							<th>
+								<h2><strong>Stats</strong></h2>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><span># veces que se ha abierto la puerta</span></td>
+							<td>
+								<span id="puerta-abierta">0</span>
+							</td>
+						</tr>
+						<tr>
+							<td><span># veces que han entrado registrados</span></td>
+							<td>
+								<span id="cara-reconocida">0</span>
+							</td>
+						</tr>
+						<tr>
+							<td><span># veces que se detecta desconocidos</span></td>
+							<td>
+								<span id="cara-desconocida">0</span>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 		</div>
 
-		<div class="col-lg-5 col-sm-12">
+
+		<div class="col-lg-4 col-sm-12">
 			<div class="cam-canvas section">
 				<h2 id="cam-title"><strong>Cámara de la puerta principal</strong></h2>
 				<p class="cam-message"></p>
-				<img src="" alt="" srcset="" id="image">
+				<img src="" alt="" srcset="" id="image" style="width:80%">
+				<p id="cam-msg"></p>
+				<div id="register-img-form-container">
+					<form action="{{ url_for('register_user') }}" method="post">
+						<input type="text" name="name" id="name" class="form-control" 
+						placeholder="Nombre de la persona" 
+						style="width:50%; margin-bottom:.6em">
+						<input type="hidden" name="img_src" id="img-src">
+						<input type="submit" value="Registrar" class="btn btn-info">
+					</form>
+				</div>
+
 			</div>
 		</div>
 
@@ -170,7 +188,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Image container listener
 	socket.on('announce image', data => {
 		const img = document.querySelector('img');
+		const data_img = document.querySelector('#img-src');
 		img.src = data['img_src'];
+		data_img.setAttribute('value', data['img_src']);
+		console.log(data['registered']);
+		console.log(typeof(data['registered']));
+		if (!data['registered']){
+			document.querySelector('#cam-msg').innerHTML = '';
+			document.querySelector('#register-img-form-container').style.display = "block";
+		} else {
+			document.querySelector('#cam-msg').innerHTML = 'Se ha registrado que ' + data['person'] + ' ha entrado.	';
+		}
 	});
 	
 });
@@ -203,18 +231,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		border: 1px solid white;
 		border-radius: 10px;
 		margin: 1em;
+		padding: 20px;
 	}
 
 	table {
-		margin-left: 30px;
-		width: 100%;
-		padding: 1em;
+		table-layout: auto;
+		width: 100%;	 
 	}
 
 	th, td {
 		width: 100px;
 		text-align: left;
-		padding: 15px;
+		padding: 10px;
 	}
 
 	/* Customize the label (the container) */
@@ -288,17 +316,19 @@ document.addEventListener('DOMContentLoaded', () => {
   border: solid rgb(255, 255, 255);
 }
 
-.cam-canvas {
-	height: 80%;
-}
 
 
-#cam-title {
-	margin: .5em 1em;
+div.cam-canvas {
+	padding-left: 1.7em;
 }
 
 #image {
 	border-radius: 10px;
-	margin: 0 2em;
+
+}
+
+#register-img-form-container {
+	display: none;
+	margin-top: 1.5em;
 }
 </style>
