@@ -13,8 +13,8 @@ How to set up Firebase
 https://iotdesignpro.com/projects/iot-controlled-led-using-firebase-database-and-esp32
 */
 
-const char* ssid = "INFINITUM149E_2.4";
-const char* password = "gmGrvgc7s7";
+const char* ssid = "INFINITUM430D_2.4";
+const char* password = "Y33kRq6cfN";
 
 //https://console.firebase.google.com/project/xxxxxxxxxx/settings/serviceaccounts/databasesecrets
 String FIREBASE_HOST = "iotv2-a811e.firebaseio.com";
@@ -147,16 +147,15 @@ void setup() {
 } 
  
 void loop() { 
-  delay(1000);
+  delay(10000);
   if(WiFi.status()==WL_CONNECTED)
   {
  
     HTTPClient client;
 
-    client.begin("http://dfc672a6085e.ngrok.io/recfacial");
+    client.begin("http://2c2575d375dc.ngrok.io/recfacial");
     size_t aux =1;
     uint8_t* auxInt= new uint8_t(1);
-    Serial.println("Sending pic to server");
     int httpCode = client.POST(auxInt, aux);
     delay(100000);
     

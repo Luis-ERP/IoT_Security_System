@@ -13,7 +13,7 @@ def intruder():
     time.sleep(10)
 
     client.publish("t4OrO5P0Ph83409/input","intruder")
-    print ("\nMQTT message Sent: intruder\n")
+    print ("Message Sent: intruder")
 
     client.loop_stop()
     client.disconnect()
@@ -30,10 +30,10 @@ def open_door():
     time.sleep(10)
 
     client.publish("t4OrO5P0Ph83409/input","yes")
-    print ("\nMQTT message Sent: yes\n")
+    print ("Message Sent: yes")
     time.sleep(10)
     client.publish("t4OrO5P0Ph83409/input","no")
-    print ("\nMQTT message Sent: no\n")
+    print ("Message Sent: no")
 
     client.loop_stop()
     client.disconnect()

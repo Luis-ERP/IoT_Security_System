@@ -23,10 +23,7 @@ def get_registers():
 	query_set = register_ref.get()
 	if not query_set:
 		return []
-	lista = []
-	for id, val in query_set.items():
-		lista.append(val)
-	return lista
+	return query_set.items()
 
 def set_register(known_boolean, person_id):
 	new_register = {
@@ -38,15 +35,9 @@ def set_register(known_boolean, person_id):
 	return register_ref.push(new_register)
 
 def get_known_people_names():
-	names = []
-	query = known_people_ref.get()
-	if not query:
-		return names
-	for id, val in query.items():
-		names.append(val['name'])
-	return names
+	return known_people_ref.get()
 
-def set_known_people_name(name):
+def set_known_people(name):
 	new_people = {'name': name}
 	return known_people_ref.push(new_people)
 
@@ -54,10 +45,7 @@ def get_door_opened():
 	query_set = door_opened_ref.get()
 	if not query_set:
 		return []
-	lista = []
-	for id, val in query_set.items():
-		lista.append(val)
-	return lista
+	return query_set.items()
 
 def set_door_opened():
 	new_door_opened = {
@@ -96,32 +84,33 @@ def get_times_opened():
 
 def times_known_faces():
 	counter = 0
-	for val in get_registers():
-		if val['registrado']:
-			counter += 1
+	"""
+	for id, data in get_registers():
+		for key in data:
+			if data[key]['registrado'] == True:
+				counter += 1
+	"""
 	return counter
 
 def times_unknown_faces():
 	counter = 0
-	for val in get_registers():
-		if not val['registrado']:
-			counter += 1
+	"""
+	for id, data in get_registers():
+		for key in data:
+			if data[key]['registrado'] == False:
+				counter += 1
+	"""
 	return counter
 
 
 ## ESTADO DE LAS IMÁGENES ----------
 def get_last_video_url():
 	# Get the list of all videos from RTDB
-	url_lists = []
-	keys = []
+	url_lists = list(range(10))
 	dict = esp32_ref.get()
-	if not dict:
-		return None
-
 	for p_id, p_info in dict.items():
 		for key in p_info:
 			url_lists.append(p_info[key])
-			keys.append(p_id)
 
 	# Get last url
 	url = url_lists[-1][23:]
@@ -131,10 +120,7 @@ def get_last_video_url():
 	url = url.replace('%2F','/')
 	url = url.replace('%3D','=')
 
-	print(f'- Última imagen de firebase descargada con id {keys[-1]}')
 	return url
-
-
 
 
 
